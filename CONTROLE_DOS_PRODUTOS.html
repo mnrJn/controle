@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Dados</title>
+
+<style>
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+    background: #dbe8ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container{
+    background: white;
+    width: 400px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input{
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+button{
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #4a7dff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover{
+    background: #2f61e0;
+}
+
+.lista{
+    margin-top: 20px;
+}
+
+.lista h2{
+    margin-bottom: 10px;
+}
+
+ul{
+    list-style: none;
+}
+
+li{
+    background: #f3f3f3;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.excluir{
+    background: red;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.calculadora{
+    margin-top: 25px;
+    background: #f5f8ff;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.calculadora h2{
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.calculadora input{
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.resultado{
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: #2f61e0;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Controle de Dados</h1>
+
+    <form id="formulario">
+
+        <input type="text" id="nome" placeholder="Digite o produto" required>
+
+        <input type="number" id="valor" placeholder="Digite o valor" required>
+
+        <button type="submit">Salvar</button>
+
+    </form>
+
+    <div class="lista">
+        <h2>Dados Salvos</h2>
+
+        <ul id="listaDados"></ul>
+    </div>
+
+    <!-- CALCULADORA -->
+    <div class="calculadora">
+
+        <h2>Calculadora</h2>
+
+        <input type="number" id="numero1" placeholder="Primeiro número">
+
+        <input type="number" id="numero2" placeholder="Segundo número">
+
+        <button onclick="somar()">Somar</button>
+
+        <div class="resultado" id="resultado">
+            Resultado: 0
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const formulario = document.getElementById('formulario');
+const listaDados = document.getElementById('listaDados');
+
+let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+
+// MOSTRAR DADOS AO ABRIR
+produtos.forEach(produto => {
+    adicionarNaTela(produto.nome, produto.valor);
+});
+
+formulario.addEventListener('submit', function(event){
+
+    event.preventDefault();
+
+    const nome = document.getElementById('nome').value;
+    const valor = document.getElementById('valor').value;
+
+    produtos.push({
+        nome: nome,
+        valor: valor
+    });
+
+    localStorage.setItem('produtos', JSON.stringify(produtos));
+
+    adicionarNaTela(nome, valor);
+
+    formulario.reset();
+
+});
+
+function adicionarNaTela(nome, valor){
+
+    const li = document.createElement('li');
+
+    li.innerHTML = `
+        ${nome} - R$ ${valor}
+        <span class="excluir">Excluir</span>
+    `;
+
+    listaDados.appendChild(li);
+
+    const excluir = li.querySelector('.excluir');
+
+    excluir.addEventListener('click', function(){
+
+        li.remove();
+
+        produtos = produtos.filter(produto =>
+            !(produto.nome === nome && produto.valor === valor)
+        );
+
+        localStorage.setItem('produtos', JSON.stringify(produtos));
+
+    });
+
+}
+
+// CALCULADORA
+function somar(){
+
+    const numero1 = Number(document.getElementById('numero1').value);
+
+    const numero2 = Number(document.getElementById('numero2').value);
+
+    const resultado = numero1 + numero2;
+
+    document.getElementById('resultado').innerHTML =
+        `Resultado: ${resultado}`;
+
+}
+
+</script>
+
+</body>
+</html>
